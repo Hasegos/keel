@@ -1,12 +1,12 @@
 ---
 name: init
-description: 현재 폴더에 keel 설정(CLAUDE.md, .claude/, docs/)을 설치한다. 기존 파일은 지우지 않고 읽어서 합치고, 프로젝트 내용을 채운다. 새 프로젝트를 시작하거나 기존 프로젝트에 keel을 붙일 때 쓴다.
+description: 현재 폴더에 keelkit 설정(CLAUDE.md, .claude/, docs/)을 설치한다. 기존 파일은 지우지 않고 읽어서 합치고, 프로젝트 내용을 채운다. 새 프로젝트를 시작하거나 기존 프로젝트에 keelkit을 붙일 때 쓴다.
 disable-model-invocation: true
 ---
 
-# keel 설치
+# keelkit 설치
 
-현재 폴더(프로젝트 루트)에 keel을 설치하고, 기존 파일과 합치고, 프로젝트에 맞게 채운다. 기존 내용은 삭제하거나 요약하지 않는다.
+현재 폴더(프로젝트 루트)에 keelkit을 설치하고, 기존 파일과 합치고, 프로젝트에 맞게 채운다. 기존 내용은 삭제하거나 요약하지 않는다.
 
 ## 1. 확인
 
@@ -23,15 +23,15 @@ python "${CLAUDE_PLUGIN_ROOT}/scripts/install.py"
 
 ## 3. 직접 합치기
 
-결과에 "직접 합쳐야 함"이 있으면, 파일마다 `.keel-backup/<시각>/original/<경로>`(기존)와 `incoming/<경로>`(keel)를 읽고 프로젝트의 실제 파일에 합친다.
+결과에 "직접 합쳐야 함"이 있으면, 파일마다 `.keel-backup/<시각>/original/<경로>`(기존)와 `incoming/<경로>`(keelkit)를 읽고 프로젝트의 실제 파일에 합친다.
 
 | 대상 | 합치는 방법 |
 |---|---|
-| `CLAUDE.md` | 기존 본문을 그대로 두고 keel의 0번 절, `Claude 설정`, `문서` 표를 추가한다. 같은 내용이 있으면 한 곳에만 둔다 |
-| `docs/*.md` | 기존 내용을 유지하고, keel 뼈대에 있고 기존에 없는 절만 `미정`으로 추가한다 |
+| `CLAUDE.md` | 기존 본문을 그대로 두고 keelkit의 0번 절, `Claude 설정`, `문서` 표를 추가한다. 같은 내용이 있으면 한 곳에만 둔다 |
+| `docs/*.md` | 기존 내용을 유지하고, keelkit 뼈대에 있고 기존에 없는 절만 `미정`으로 추가한다 |
 | `.claude/rules/*.md` | 기존 규칙을 유지한다. 서로 어긋나는 규칙은 어느 쪽을 쓸지 사용자에게 묻는다 |
-| `.claude/hooks/*.py` | 기존 검사를 유지하고 keel의 검사를 추가한다. 합친 뒤 `python -m py_compile <파일>`로 문법을 확인한다 |
-| skill, agent | 기존 것을 유지한다. 같은 이름이면 keel의 내용 중 없는 부분만 합친다 |
+| `.claude/hooks/*.py` | 기존 검사를 유지하고 keelkit의 검사를 추가한다. 합친 뒤 `python -m py_compile <파일>`로 문법을 확인한다 |
+| skill, agent | 기존 것을 유지한다. 같은 이름이면 keelkit의 내용 중 없는 부분만 합친다 |
 
 합칠 수 없는 항목은 그대로 두고 보고한다.
 

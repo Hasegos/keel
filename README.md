@@ -1,20 +1,20 @@
-# keel
+# keelkit
 
-> 어떤 프로젝트든 같은 뼈대로 시작한다. 폴더를 열고 `/keel:init` 한 줄이면 `CLAUDE.md`, `.claude/`, `docs/`가 깔리고 Claude가 프로젝트를 읽어서 채운다.
+> 어떤 프로젝트든 같은 뼈대로 시작한다. 폴더를 열고 `/keelkit:init` 한 줄이면 `CLAUDE.md`, `.claude/`, `docs/`가 깔리고 Claude가 프로젝트를 읽어서 채운다.
 
 Claude Code 플러그인. 특정 언어나 프레임워크에 묶이지 않는다.
 
 ## 설치
 
 ```bash
-/plugin marketplace add Hasegos/keel
-/plugin install keel@keel
+/plugin marketplace add Hasegos/keelkit
+/plugin install keelkit@keelkit
 ```
 
 프로젝트 폴더를 새 세션으로 열고 실행한다.
 
 ```bash
-/keel:init
+/keelkit:init
 ```
 
 hook과 권한은 새 세션부터 적용된다.
@@ -46,8 +46,8 @@ my-project/
 |---|---|
 | 없음 | 새로 만든다 |
 | 내용이 같음 | 건너뛴다 |
-| `.claude/settings.json` | 기존 권한과 hook은 유지하고 keel 것만 추가한다 |
-| 그 외 (`CLAUDE.md`, `docs/*`, `rules/*` 등) | `.keel-backup/<시각>/`에 기존 파일과 keel 파일을 복사해 두고, Claude가 둘을 읽어서 합친다. 규칙이 서로 어긋나면 어느 쪽을 쓸지 묻는다 |
+| `.claude/settings.json` | 기존 권한과 hook은 유지하고 keelkit 것만 추가한다 |
+| 그 외 (`CLAUDE.md`, `docs/*`, `rules/*` 등) | `.keel-backup/<시각>/`에 기존 파일과 keelkit 파일을 복사해 두고, Claude가 둘을 읽어서 합친다. 규칙이 서로 어긋나면 어느 쪽을 쓸지 묻는다 |
 
 - `.gitignore`에는 `.env`와 `.keel-backup/`만 추가한다.
 - 합친 결과를 확인한 뒤 `.keel-backup/`은 직접 지운다.
@@ -87,7 +87,7 @@ my-project/
 | 질문 | 답 |
 |---|---|
 | 일부만 쓸 수 있나? | 설치 뒤 필요 없는 파일을 지우면 된다. |
-| 플러그인을 업데이트하면? | `/keel:init`을 다시 실행한다. 이미 채운 파일은 덮어쓰지 않고 "직접 합쳐야 함"으로만 보고하며 백업이 남는다. |
+| 플러그인을 업데이트하면? | `/keelkit:init`을 다시 실행한다. 이미 채운 파일은 덮어쓰지 않고 "직접 합쳐야 함"으로만 보고하며 백업이 남는다. |
 | hook이 동작하지 않는다 | 새 세션에서 열었는지, `python`이 PATH에 있는지 확인한다. |
 
 ## 라이선스
