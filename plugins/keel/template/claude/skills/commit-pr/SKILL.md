@@ -54,6 +54,18 @@ EOF
               + <변경 내용. "~했습니다." 체>
 
 - `dev` → `main` PR은 사용자가 요청할 때 `--base main --head dev`로 만든다. 병합은 하지 않고, 사용자에게 Create a merge commit으로 병합하라고 안내한다. squash로 병합하면 `main`이 `dev`의 커밋과 연결되지 않아 다음 PR에서 같은 파일이 충돌한다 (squash는 feature → `dev`에서만 쓴다).
+- `dev` → `main` PR 본문은 PR을 만들기 직전에 `main`에 아직 없는 `dev` 커밋을 뽑아서 쓴다. `dev` 커밋 제목이 `<PR 제목> (#N)`이라 이 목록이 병합된 PR 목록이다. `main`이 없으면 `master`로 바꾼다.
+
+```bash
+git fetch
+git log --first-parent --format='- %s' origin/main..origin/dev
+```
+
+      ## 변경 사항
+
+      <위 명령 출력을 그대로>
+
+  제목은 변경이 한 건이면 그 PR 제목을 쓰고, 여러 건이면 `ADD <묶음 요약> 반영`처럼 한 문장으로 쓴다.
 
 ## 4. 병합
 
