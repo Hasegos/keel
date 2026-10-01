@@ -53,16 +53,16 @@ EOF
           + <계층 (파일 · 클래스)>
               + <변경 내용. "~했습니다." 체>
 
-- `dev` → `main` PR은 사용자가 요청할 때 `--base main --head dev`로 만든다. 병합은 하지 않는다.
+- `dev` → `main` PR은 사용자가 요청할 때 `--base main --head dev`로 만든다. 병합은 하지 않고, 사용자에게 Create a merge commit으로 병합하라고 안내한다. squash로 병합하면 `main`이 `dev`의 커밋과 연결되지 않아 다음 PR에서 같은 파일이 충돌한다 (squash는 feature → `dev`에서만 쓴다).
 
 ## 4. 병합
 
 `dev`를 체크아웃한 상태에서 실행한다 (현재 브랜치가 병합 대상 브랜치이면 gh가 기본 브랜치로 바꿔 놓을 수 있다).
 
-- 대상이 `dev`이면 squash 병합한다. 병합 메시지는 PR 제목(`(#N)` 없이) + PR 본문으로 한다. 결과는 `dev`에 부모 1개짜리 커밋 하나.
+- 대상이 `dev`이면 squash 병합한다. 병합 메시지는 PR 제목 + ` (#<번호>)` + PR 본문으로 한다. 커밋에서 PR로 바로 찾아갈 수 있다. 결과는 `dev`에 부모 1개짜리 커밋 하나.
 
 ```bash
-gh pr merge <번호> --squash --delete-branch --subject "<PR 제목>" --body-file - <<'EOF'
+gh pr merge <번호> --squash --delete-branch --subject "<PR 제목> (#<번호>)" --body-file - <<'EOF'
 <PR 본문>
 EOF
 ```
