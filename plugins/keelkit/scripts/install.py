@@ -80,11 +80,11 @@ def render(rel: Path, variables: dict[str, str]) -> str:
 
 
 def merge_settings(existing: dict, incoming: dict) -> dict:
-    """기존 settings.json 에 keel 의 권한과 hook 을 더한다. 기존 항목은 지우지 않는다.
+    """기존 settings.json 에 keelkit 의 권한과 hook 을 더한다. 기존 항목은 지우지 않는다.
 
     Args:
         existing: 프로젝트의 기존 설정
-        incoming: keel 설정
+        incoming: keelkit 설정
     Returns:
         합친 설정
     """
@@ -143,7 +143,7 @@ def settings_status(current: str, incoming: str) -> dict:
 
     Args:
         current: 프로젝트의 기존 본문
-        incoming: keel 본문
+        incoming: keelkit 본문
     Returns:
         status 와, 합칠 수 있으면 합친 본문(text)
     """
@@ -220,7 +220,7 @@ def report(entries: list[dict], ignored: list[str], target: Path, backup: Path, 
         dry_run: 미리보기 여부
     """
     labels = [("new", "새로 만듦"), ("same", "이미 같음"), ("merge", "자동으로 합침"), ("conflict", "직접 합쳐야 함")]
-    print(f"keel 설치 {'미리보기' if dry_run else '결과'}: {target}")
+    print(f"keelkit 설치 {'미리보기' if dry_run else '결과'}: {target}")
     for status, label in labels:
         names = [e["rel"] for e in entries if e["status"] == status]
         if names:
@@ -228,13 +228,13 @@ def report(entries: list[dict], ignored: list[str], target: Path, backup: Path, 
             for name in names:
                 print(f"  - {name}")
     if any(e["status"] in ("merge", "conflict") for e in entries):
-        print(f"\n백업: {backup.relative_to(target).as_posix()}/original (기존 파일), {backup.relative_to(target).as_posix()}/incoming (keel 파일)")
+        print(f"\n백업: {backup.relative_to(target).as_posix()}/original (기존 파일), {backup.relative_to(target).as_posix()}/incoming (keelkit 파일)")
     if ignored:
         print(f"\n.gitignore {'에 추가할 줄' if dry_run else '에 추가함'}: {', '.join(ignored)}")
 
 
 def main() -> int:
-    """프로젝트 폴더에 keel 템플릿을 설치한다. 기존 파일은 지우거나 덮어쓰지 않는다.
+    """프로젝트 폴더에 keelkit 템플릿을 설치한다. 기존 파일은 지우거나 덮어쓰지 않는다.
 
     Returns:
         종료 코드
