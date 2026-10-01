@@ -53,7 +53,7 @@ EOF
           + <계층 (파일 · 클래스)>
               + <변경 내용. "~했습니다." 체>
 
-- `dev` → `main` PR은 사용자가 요청할 때 `--base main --head dev`로 만든다. 병합은 하지 않는다.
+- `dev` → `main` PR은 사용자가 요청할 때 `--base main --head dev`로 만든다. 병합은 하지 않고, 사용자에게 Create a merge commit으로 병합하라고 안내한다. squash로 병합하면 `main`이 `dev`의 커밋과 연결되지 않아 다음 PR에서 같은 파일이 충돌한다 (squash는 feature → `dev`에서만 쓴다).
 
 ## 4. 병합
 
