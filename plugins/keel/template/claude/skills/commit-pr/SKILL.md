@@ -59,10 +59,10 @@ EOF
 
 `dev`를 체크아웃한 상태에서 실행한다 (현재 브랜치가 병합 대상 브랜치이면 gh가 기본 브랜치로 바꿔 놓을 수 있다).
 
-- 대상이 `dev`이면 squash 병합한다. 병합 메시지는 PR 제목(`(#N)` 없이) + PR 본문으로 한다. 결과는 `dev`에 부모 1개짜리 커밋 하나.
+- 대상이 `dev`이면 squash 병합한다. 병합 메시지는 PR 제목 + ` (#<번호>)` + PR 본문으로 한다. 커밋에서 PR로 바로 찾아갈 수 있다. 결과는 `dev`에 부모 1개짜리 커밋 하나.
 
 ```bash
-gh pr merge <번호> --squash --delete-branch --subject "<PR 제목>" --body-file - <<'EOF'
+gh pr merge <번호> --squash --delete-branch --subject "<PR 제목> (#<번호>)" --body-file - <<'EOF'
 <PR 본문>
 EOF
 ```
