@@ -38,7 +38,7 @@ description: 프로젝트의 Claude 설정(CLAUDE.md, docs, rules, skills, hooks
    - 파일 맨 위 `paths:`에는 그 규칙이 필요한 파일 패턴을 적는다.
    - `.gitignore`에 `.env`가 없으면 추가한다. `.env`는 하나만 쓰므로 `.env.*`는 추가하지 않는다. 이미 추적 중인 `.env*` 파일이나 `.env.example` 같은 파일이 있으면 사용자에게 알린다 (합치거나 추적 해제하는 것은 삭제이므로 확인을 받는다).
    - `docs/SETUP.md` 3번에는 `.env`의 키 이름만 적는다. `.env`는 열어서 읽지 않고 `grep -oE '^[A-Za-z_][A-Za-z0-9_]*' .env`로 키 이름만 뽑는다 (값이 출력에 섞이지 않게).
-5. 마무리한다. `미정`이 남은 곳을 검색해서 사용자에게 알리고, `CLAUDE.md` 0번 절을 지운다. 무엇을 어디에 채웠는지 표로 보고한다. `gh --version`과 `gh auth status`로 `gh` 준비를 확인하고, 없으면 설치(`winget install GitHub.cli`)와 `gh auth login`을 사용자가 직접 하도록 안내한다. 보고 끝에 GitHub 저장소 설정(Settings → General → Automatically delete head branches)을 켜 두면 병합 즉시 원격 feature 브랜치가 자동 삭제된다고 안내한다. 설정은 사용자가 직접 바꾼다.
+5. 마무리한다. `미정`이 남은 곳을 검색해서 사용자에게 알리고, `CLAUDE.md` 0번 절을 지운다. 무엇을 어디에 채웠는지 표로 보고한다. `gh --version`과 `gh auth status`로 `gh` 준비를 확인하고, 없으면 설치(`winget install GitHub.cli`)와 `gh auth login`을 사용자가 직접 하도록 안내한다. 보고 끝에 GitHub 저장소 설정(Settings → General → Automatically delete head branches)을 켜 두면 병합 즉시 원격 feature 브랜치가 자동 삭제된다고 안내한다. 같은 화면 Pull Requests 섹션에서 merge commit과 squash의 Default commit message를 Pull request title and description으로 바꿔 두면, 사용자가 `dev` → `main` PR을 병합할 때 병합 창에 PR 제목과 본문이 채워진다고 안내한다 (설정하지 않으면 `Merge pull request #N from ...`만 나온다). 설정은 사용자가 직접 바꾼다.
 
 ## 2. 나중에 바꾸기 (규칙 · 절차 · 금지 · 자동화 요청)
 
