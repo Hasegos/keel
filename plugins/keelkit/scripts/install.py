@@ -62,20 +62,54 @@ def project_variables(target: Path) -> dict[str, str]:
     return values
 
 
-def render(rel: Path, variables: dict[str, str]) -> str:
+def is_skipped(rel: str, skip: list[str]) -> bool:
+    """건너뛸 경로인지 판단한다. 폴더를 주면 그 아래 전체가 해당한다.
+
+    Args:
+        rel: 프로젝트 기준 상대 경로
+        skip: 건너뛸 경로 목록
+    Returns:
+        건너뛸 경로이면 True
+    """
+    return any(rel == s or rel.startswith(s + "/") for s in skip)
+
+
+def drop_skipped_hooks(text: str, skip: list[str]) -> str:
+    """건너뛴 hook 파일을 부르는 항목을 settings.json 본문에서 뺀다. 없는 파일을 가리키는 hook 이 남지 않게 한다.
+
+    Args:
+        text: settings.json 본문
+        skip: 건너뛸 경로 목록
+    Returns:
+        hook 항목을 뺀 본문
+    """
+    data = json.loads(text)
+    for event, groups in list(data.get("hooks", {}).items()):
+        for group in groups:
+            group["hooks"] = [h for h in group.get("hooks", []) if not any(s in h.get("command", "") for s in skip)]
+        data["hooks"][event] = [g for g in groups if g["hooks"]]
+    data["hooks"] = {event: groups for event, groups in data.get("hooks", {}).items() if groups}
+    return json.dumps(data, ensure_ascii=False, indent=2) + "\n"
+
+
+def render(rel: Path, variables: dict[str, str], skip: list[str]) -> str:
     """템플릿 파일을 읽어 변수를 채운다. 시스템에 python 이 없고 python3 만 있으면 hook 명령을 python3 으로 바꾼다.
 
     Args:
         rel: 템플릿 기준 상대 경로
         variables: 변수 이름과 값
+        skip: 건너뛸 경로 목록. settings.json 에서 그 hook 을 뺀다
     Returns:
         변수를 채운 본문
     """
     text = (TEMPLATE / rel).read_text(encoding="utf-8")
     for key, value in variables.items():
         text = text.replace("{{" + key + "}}", value)
-    if target_path(rel).as_posix() == SETTINGS_REL and not shutil.which("python") and shutil.which("python3"):
-        text = text.replace('"command": "python ', '"command": "python3 ')
+    if target_path(rel).as_posix() == SETTINGS_REL:
+        if not shutil.which("python") and shutil.which("python3"):
+            text = text.replace('"command": "python ', '"command": "python3 ')
+        if skip:
+            text = drop_skipped_hooks(text, skip)
     return text
 
 
@@ -103,14 +137,15 @@ def merge_settings(existing: dict, incoming: dict) -> dict:
     return merged
 
 
-def plan(target: Path, variables: dict[str, str]) -> list[dict]:
+def plan(target: Path, variables: dict[str, str], skip: list[str]) -> list[dict]:
     """템플릿의 모든 파일을 프로젝트와 비교해서 처리 방식을 정한다.
 
     Args:
         target: 프로젝트 폴더
         variables: 변수 이름과 값
+        skip: 건너뛸 경로 목록 (기존 것을 유지할 때)
     Returns:
-        파일별 {rel, status, text}. status 는 new, same, merge, conflict 중 하나
+        파일별 {rel, status, text}. status 는 new, same, merge, conflict, skip 중 하나
     """
     entries = []
     for source in sorted(TEMPLATE.rglob("*")):
@@ -119,7 +154,10 @@ def plan(target: Path, variables: dict[str, str]) -> list[dict]:
         rel      = source.relative_to(TEMPLATE)
         dest_rel = target_path(rel)
         dest     = target / dest_rel
-        text     = render(rel, variables)
+        if is_skipped(dest_rel.as_posix(), skip):
+            entries.append({"rel": dest_rel.as_posix(), "text": "", "status": "skip"})
+            continue
+        text     = render(rel, variables, skip)
         entry    = {"rel": dest_rel.as_posix(), "text": text, "status": "new"}
         if dest.exists():
             try:
@@ -219,7 +257,7 @@ def report(entries: list[dict], ignored: list[str], target: Path, backup: Path, 
         backup: 이번 실행의 백업 폴더
         dry_run: 미리보기 여부
     """
-    labels = [("new", "새로 만듦"), ("same", "이미 같음"), ("merge", "자동으로 합침"), ("conflict", "직접 합쳐야 함")]
+    labels = [("new", "새로 만듦"), ("same", "이미 같음"), ("merge", "자동으로 합침"), ("conflict", "직접 합쳐야 함"), ("skip", "건너뜀 (기존 유지)")]
     print(f"keelkit 설치 {'미리보기' if dry_run else '결과'}: {target}")
     for status, label in labels:
         names = [e["rel"] for e in entries if e["status"] == status]
@@ -243,14 +281,16 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--target", default=".", help="설치할 프로젝트 폴더 (기본: 현재 폴더)")
     parser.add_argument("--dry-run", action="store_true", help="파일을 쓰지 않고 계획만 출력한다")
+    parser.add_argument("--skip", nargs="*", default=[], help="설치하지 않을 경로 (프로젝트 기준, 폴더 가능). 기존 것을 유지할 때 쓴다")
     args   = parser.parse_args()
     target = Path(args.target).resolve()
+    skip   = [s for s in (p.replace("\\", "/").strip("/") for p in args.skip) if s]
 
     if not target.is_dir() or target == Path.home() or (target / ".claude-plugin").exists():
         print(f"설치할 수 없는 폴더입니다: {target}", file=sys.stderr)
         return 1
 
-    entries = plan(target, project_variables(target))
+    entries = plan(target, project_variables(target), skip)
     stamp   = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     backup  = target / BACKUP_ROOT / stamp
     if not args.dry_run:

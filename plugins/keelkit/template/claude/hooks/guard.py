@@ -4,6 +4,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+# 기존 프로젝트에 같은 검사가 이미 있어서 끌 검사 (coauthor, env, protected, delete). keelkit:init 이 정한다.
+DISABLED       = set()
 PROTECTED      = ("master", "main")
 PROT           = r"(?:(?<![\w./-])|refs/heads/)(?:" + "|".join(PROTECTED) + r")(?![\w./-])"
 ENV_FILE       = re.compile(r"(?:^|/)\.env(?:\.[^/]+)?$")
@@ -72,6 +74,8 @@ def check_env(command: str, cwd: str | None) -> str | None:
     Returns:
         차단 이유. 해당하지 않으면 None
     """
+    if "env" in DISABLED:
+        return None
     reason = ".env 계열 파일은 커밋하지 않는다 (사용자 규칙). .gitignore 에 넣고 add 에서 뺀다."
     if re.search(r"\bgit\s+add\b[^;&|]*\.env\b", command):
         return reason
@@ -92,12 +96,15 @@ def check_block(command: str, cwd: str | None) -> str | None:
     Returns:
         차단 이유. 해당하지 않으면 None
     """
-    if re.search(r"\bgit\b.*\bcommit\b", command) and any(re.search(r"co-authored-by", t, re.I) for t in commit_message_texts(command)):
+    if "coauthor" not in DISABLED and re.search(r"\bgit\b.*\bcommit\b", command) and any(re.search(r"co-authored-by", t, re.I) for t in commit_message_texts(command)):
         return "커밋 메시지에 Co-Authored-By 를 넣지 않는다 (사용자 규칙). 그 줄을 빼고 다시 커밋하세요."
 
     reason = check_env(command, cwd)
     if reason:
         return reason
+
+    if "protected" in DISABLED:
+        return None
 
     if re.search(r"\bgit\b[^;&|]*\b(?:merge|push)\b", command):
         pushes_protected = re.search(r"\bgit\b[^;&|]*\bpush\b[^;&|]*" + PROT, command)
@@ -123,7 +130,7 @@ def check_file(path: str) -> str | None:
     Returns:
         차단 이유. 해당하지 않으면 None
     """
-    if ENV_EXTRA.search(path):
+    if "env" not in DISABLED and ENV_EXTRA.search(path):
         return ".env 하나만 쓴다 (사용자 규칙). .env.example, .env.local 같은 파일은 만들지 않는다. 키 설명은 docs 에 적는다."
     return None
 
@@ -136,6 +143,8 @@ def check_delete(command: str) -> str | None:
     Returns:
         삭제 사유. 해당하지 않으면 None
     """
+    if "delete" in DISABLED:
+        return None
     for segment in re.split(r"[;&|\n]+", command):
         if any(p.search(segment) for p in FEATURE_DELETE):
             continue
